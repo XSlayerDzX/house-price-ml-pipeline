@@ -1,4 +1,4 @@
-name: Deploy to Heroku
+name: Deploy to Heroku (Docker)
 
 on:
   push:
@@ -9,25 +9,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install Heroku CLI so the deploy step can use `heroku` commands
-      - name: Install Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Build, Push and Release Docker container to Heroku
-        uses: gonuit/heroku-docker-deploy@v1.3.3
+      # Install & configure Heroku CLI (uses your API key)
+      - name: Set up Heroku CLI
+        uses: heroku/actions/setup-heroku@v2
         with:
-          email: ${{ secrets.HEROKU_EMAIL }}
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku-api-key: ${{ secrets.HEROKU_API_KEY }}
 
-          dockerfile_directory: ./
-          dockerfile_name: Dockerfile
-          docker_options: ""      # allow Docker caching for faster builds
-          process_type: web
+      # (Optional) login to Docker Hub if you pull private bases
+      # - name: Docker Hub login
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to Heroku Container Registry
+        run: heroku container:login
+
+      - name: Build Docker image
+        run: docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
+
+      - name: Push Docker image
+        run: docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+
+      - name: Release to Heroku
+        run: heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
