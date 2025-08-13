@@ -1,6 +1,6 @@
 # House Price Prediction — Flask · scikit‑learn/XGBoost · Docker · Heroku
 
-This is my first end‑to‑end ML project. I trained a model to predict house prices (Ames dataset vibe), wrapped it in a Flask app, containerized it with Docker, and set up automatic deploys to Heroku using GitHub Actions. I’m keeping this README short and practical so anyone can run the same setup I’m using.
+This is my first end‑to‑end ML project. I trained a model to predict house prices (Ames dataset), wrapped it in a Flask app, containerized it with Docker, and set up automatic deploys to Heroku using GitHub Actions. I’m keeping this README short and practical so anyone can run the same setup I’m using.
 
 ---
 
@@ -31,7 +31,7 @@ Now open `http://localhost:5000`.
 ---
 
 ## Deploys (GitHub Actions → Heroku)
-
+Live app: https://housepredectionpipeline-0a04d51ed8a0.herokuapp.com
 - On every push to `main`, the workflow at `.github/workflows/deploy-heroku.yml` runs.
 - It installs the Heroku CLI on the runner, switches the app to the **container** stack if needed, logs in to the container registry, builds the Docker image, pushes it to `registry.heroku.com/<app>/web`, and releases it.
 - You need two repo **secrets**:
