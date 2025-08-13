@@ -11,6 +11,9 @@ This is my first end‑to‑end ML project. I trained a model to predict house p
 - GitHub Actions builds the image and releases it to Heroku whenever I push to `main`.
 
 ---
+![App homepage](docs/images/app_home.png)
+![Architecture diagram](docs/images/architecture.png)
+![CI/CD successful deploy](docs/images/gh_actions.png)
 
 ## How to run it (exact commands I use)
 
