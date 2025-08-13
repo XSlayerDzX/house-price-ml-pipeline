@@ -18,7 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install the Heroku CLI in this runner
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
@@ -26,7 +25,12 @@ jobs:
         run: |
           command -v heroku
           heroku --version
-          heroku auth:whoami || true   # just to show it's reading HEROKU_API_KEY
+
+      # ⬇️ This is what fixes the "This command is for Docker apps only" error
+      - name: Ensure app uses the container stack
+        run: |
+          heroku stack:set container --app ${{ secrets.HEROKU_APP_NAME }}
+          heroku stack --app ${{ secrets.HEROKU_APP_NAME }}
 
       - name: Login to Heroku Container Registry
         run: heroku container:login
