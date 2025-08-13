@@ -16,22 +16,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install & configure Heroku CLI (uses your API key)
+      # Install Heroku CLI in THIS runner (not inside another action's container)
       - name: Set up Heroku CLI
         uses: heroku/actions/setup-heroku@v2
         with:
           heroku-api-key: ${{ secrets.HEROKU_API_KEY }}
 
-      # (Optional) login to Docker Hub if you pull private bases
-      # - name: Docker Hub login
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Sanity checks so we fail early if heroku isn't on PATH
+      - name: Verify Heroku CLI
+        run: |
+          echo "PATH=$PATH"
+          command -v heroku || (echo "heroku not found" && exit 1)
+          heroku --version
 
       - name: Login to Heroku Container Registry
         run: heroku container:login
 
+      # Build your Dockerfile at repo root
       - name: Build Docker image
         run: docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
 
