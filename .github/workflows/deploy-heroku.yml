@@ -11,22 +11,22 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install Heroku CLI on the runner
-      - name: Set up Heroku CLI
-        uses: heroku/actions/setup-heroku@v2
-        with:
-          heroku-api-key: ${{ secrets.HEROKU_API_KEY }}
+      # Install the Heroku CLI in this runner
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
 
-      # (Optional) quick sanity check
       - name: Verify Heroku CLI
         run: |
           command -v heroku
           heroku --version
+          heroku auth:whoami || true   # just to show it's reading HEROKU_API_KEY
 
       - name: Login to Heroku Container Registry
         run: heroku container:login
