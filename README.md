@@ -28,19 +28,6 @@ docker run -p 5000:5000 -e PORT=5000 houseprice-api
 
 Now open `http://localhost:5000`.
 
-### Option B — Without Docker (dev only)
-
-```bash
-# Python 3.11
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-export PORT=5000
-# I use gunicorn the same way production does
-gunicorn --workers=4 --bind 0.0.0.0:$PORT app:app
-```
-
-Visit `http://localhost:5000`.
-
 ---
 
 ## Deploys (GitHub Actions → Heroku)
@@ -62,14 +49,12 @@ I didn’t rely on just one algorithm. I trained two separate regressors and ble
 - **ElasticNet** (linear model with L1/L2 regularization). Good at handling multicollinearity and gives stable, interpretable effects.
 - **XGBoost** (gradient‑boosted trees). Good at capturing non‑linear interactions and handling mixed feature types.
 
-I tuned each model separately (regularization for ElasticNet; learning rate, depth, estimators, etc. for XGBoost) using cross‑validation. After that, I **combined their predictions with a weighted average**. The weight favors the model that performed better on CV (for me, XGBoost had the edge, so something like `final = 0.55 * xgb + 0.45 * elastic` worked best). Blending reduces variance and usually beats either model alone.
+I tuned each model separately (regularization for ElasticNet; learning rate, depth, estimators, etc. for XGBoost) using cross‑validation. After that, I **combined their predictions (averaged them) **. Blending reduces variance and usually beats either model alone.
 
 **Artifacts**
 
-- I save the tree model as a JSON file (portable across versions) and the linear model as a `.joblib` file.
-- At app startup, both models are loaded, a feature preprocessing step is applied in the same way as during training, and the final prediction is computed as the weighted blend.
-- If you retrain, drop in the new artifacts under `models/` (same filenames) and adjust the weights in `app.py`.
-
+- I save both models using pickle
+- At app startup, both models are loaded, a feature preprocessing step is applied in the same way as during training, and the final prediction is computed.
 ---
 
 ## Why I’m using Docker + Actions
