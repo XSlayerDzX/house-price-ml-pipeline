@@ -34,7 +34,7 @@ Now open `http://localhost:5000`.
 ---
 
 ## Deploys (GitHub Actions → Heroku)
-Live app: https://housepredectionpipeline-0a04d51ed8a0.herokuapp.com
+Live app: https://housepredectionpipeline-0a04d51ed8a0.herokuapp.com ( the site is down, Heroku is charging me money :( )
 - On every push to `main`, the workflow at `.github/workflows/deploy-heroku.yml` runs.
 - It installs the Heroku CLI on the runner, switches the app to the **container** stack if needed, logs in to the container registry, builds the Docker image, pushes it to `registry.heroku.com/<app>/web`, and releases it.
 - You need two repo **secrets**:
